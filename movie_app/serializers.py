@@ -1,36 +1,16 @@
 from rest_framework import serializers
-from movie_app.models import Director, Movie, Review
+from movie_app.models import Director, Movie, Review, stars
 
 
 class DirectorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Director
-        fields = 'director'
+        fields = '__all__'
 
 
 class DirectorDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Director
-        fields = 'id', 'name'
-
-
-class MovieSerializer(serializers.ModelSerializer):
-    rating = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Movie
-        fields = ('id', 'title', 'description', 'duration', 'director', 'rating')
-
-        def get_rating(self, obj):
-            review_all = obj.movie_review.all()
-            rate = [i.rate_stars for i in review_all]
-            rate_avg = sum(rate) / len(rate)
-            return rate_avg
-
-
-class MovieDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Movie
         fields = '__all__'
 
 
@@ -40,20 +20,38 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'text', 'rate_stars')
 
 
+class MovieSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Movie
+        fields = ['id', 'title', 'description', 'duration', 'director']
+
+
+class MovieDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Movie
+        fields = '__all__'
+
+
 class ReviewDetailSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Review
-        fields = ('id', 'text', 'movie')
+        fields = '__all__'
 
-    class DirectorSerializer(serializers.ModelSerializer):
-        movie_count = serializers.SerializerMethodField()
 
-        class Meta:
-            model = Director
-            fields = ('id', 'name', 'movie_count')
+class MovieReviewSerializer(serializers.ModelSerializer):
+    reviews = ReviewDetailSerializer(many=True, read_only=True)
+    rating = serializers.SerializerMethodField()
 
-        def get_movie_count(self, obj):
-            return obj.movie_director.count()
+    class Meta:
+        model = Movie
+        fields = ['id', 'title', 'description', 'duration', 'director', 'reviews', 'rating']
+
+    def get_rating(self, obj):
+        review_all = obj.reviews.all()
+        rate = [i.rate_stars for i in review_all]
+        rate_avg = sum(rate) / len(rate)
+        return rate_avg
 
 
 class DirValidateSerializer(serializers.Serializer):
@@ -89,7 +87,7 @@ class DirValidateSerializer(serializers.Serializer):
 
 
 class MovieValidateSerializer(serializers.Serializer):
-    title = serializers.CharField(max_length=150)
+    title = serializers.CharField(min_length=10)
     description = serializers.CharField()
     duration = serializers.CharField(max_length=10)
     director = serializers.CharField()
@@ -137,25 +135,17 @@ class MovieValidateSerializer(serializers.Serializer):
 
 
 class ReviewValidateSerializer(serializers.Serializer):
-    stars = (
-        '*', '*',
-        '**', '**',
-        '***', '***',
-        '****', '****',
-        '*****', '*****',
-    )
-    rate_stars = serializers.ChoiceField(choices=stars)
     text = serializers.CharField()
     movie = serializers.CharField()
 
-    def validate_dir(self, value: int):
+    def validate_review(self, value: int):
         try:
             Review.objects.get(id=value)
         except Review.DoesNotExist:
             raise serializers.ValidationError('Обзор не найден!')
         return value
 
-    def validate_name(self, value):
+    def validate_text(self, value):
         if len(value) < 10:
             raise serializers.ValidationError('Длина заголовка должна быть больше 10 символов')
         return value
