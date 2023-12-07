@@ -1,4 +1,5 @@
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -8,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@gi14buo@uylg4wnr6hcx9jlp-%ag)!zv#o9)*34@f(6j&3853'
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -19,6 +20,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -29,17 +31,12 @@ INSTALLED_APPS = [
     #third party apps
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_yasg',
 
     #local apps
     'movie_app',
     'users',
 ]
-
-REST_FRAMEWORK = {
-    'DEFAULT_AUTENTICATION_CLASSES': [
-        'rest_framework.autentication.TokenAutentication'
-    ]
-}
 
 
 MIDDLEWARE = [
@@ -77,11 +74,15 @@ WSGI_APPLICATION = 'afisha.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+     'default': {
+         'ENGINE': 'django.db.backends.postgresql',
+         'NAME': config("DB_NAME"),
+         'USER': config("DB_USER"),
+         'PASSWORD': config("DB_PASSWORD"),
+         'HOST': config("DB_HOST"),
+         'PORT': config("DB_PORT", cast=int),
+     }
+ }
 
 
 # Password validation
@@ -124,3 +125,17 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTENTICATION_CLASSES': [
+        'rest_framework.autentication.TokenAutentication'
+    ],
+    'PAGE_SIZE': 3,
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_FILTER_BACKENDS': [
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter'
+    ]
+}
+

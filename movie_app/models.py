@@ -32,7 +32,5 @@ class Review(models.Model):
     rate_stars = models.IntegerField(default=1, choices=[(i, i * '*') for i in range(1, 6)])
     movie = models.ForeignKey(Movie, on_delete=models.Model, verbose_name='Обзор', related_name='reviews')
 
-
-
     def __str__(self):
         return f'Обзор: {self.text}'

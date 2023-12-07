@@ -1,16 +1,49 @@
-from rest_framework import status
-from rest_framework.decorators import api_view
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView, ListAPIView
-from rest_framework.response import Response
 from movie_app.models import Movie, Director, Review
-
 from movie_app.serializers import DirectorSerializer, MovieSerializer, ReviewSerializer, MovieDetailSerializer, \
     DirectorDetailSerializer, \
-    ReviewDetailSerializer, DirValidateSerializer, MovieReviewSerializer
+    ReviewDetailSerializer, MovieReviewSerializer
+
+
+class DirectorAPIView(ListCreateAPIView):
+    queryset = Director.objects.all()
+    serializer_class = DirectorSerializer
+
+
+class DirectorDetailAPIVIew(RetrieveUpdateDestroyAPIView):
+    queryset = Director.objects.all()
+    serializer_class = DirectorDetailSerializer
+    lookup_field = 'id'
+
+
+class MovieAPIView(ListCreateAPIView):
+    queryset = Movie.objects.all()
+    serializer_class = MovieSerializer
+
+
+class MovieDetailAPIVIew(RetrieveUpdateDestroyAPIView):
+    queryset = Movie.objects.all()
+    serializer_class = MovieDetailSerializer
+    lookup_field = 'id'
+
+
+class ReviewAPIView(ListCreateAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
+
+class ReviewDetailAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewDetailSerializer
+    lookup_field = 'id'
+
+
+class ReviewMovieAPIView(ListAPIView):
+    queryset = Movie.objects.all()
+    serializer_class = MovieReviewSerializer
 
 
 # method GET, POST, PUT, PATCH, DELETE
-
 
 # @api_view(['GET', 'POST'])
 # def get_director_list(request):
@@ -24,11 +57,6 @@ from movie_app.serializers import DirectorSerializer, MovieSerializer, ReviewSer
 #             serializer.save()
 #             return Response(serializer.data, status=status.HTTP_201_CREATED)
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class DirectorAPIView(ListCreateAPIView):
-    queryset = Director.objects.all()
-    serializer_class = DirectorSerializer
 
 
 # @api_view(['GET', 'PUT', 'DELETE'])
@@ -67,12 +95,6 @@ class DirectorAPIView(ListCreateAPIView):
 #         )
 
 
-class DirectorDetailAPIVIew(RetrieveUpdateDestroyAPIView):
-    queryset = Director.objects.all()
-    serializer_class = DirectorDetailSerializer
-    lookup_field = 'id'
-
-
 # @api_view(['GET', 'POST'])
 # def get_movie_list(request):
 #     if request.method == 'GET':
@@ -99,11 +121,6 @@ class DirectorDetailAPIVIew(RetrieveUpdateDestroyAPIView):
 #             },
 #             status=201
 #         )
-
-
-class MovieAPIView(ListCreateAPIView):
-    queryset = Movie.objects.all()
-    serializer_class = MovieSerializer
 
 
 # @api_view(['GET', 'PUT', 'DELETE'])
@@ -142,12 +159,6 @@ class MovieAPIView(ListCreateAPIView):
 #         )
 
 
-class MovieDetailAPIVIew(RetrieveUpdateDestroyAPIView):
-    queryset = Movie.objects.all()
-    serializer_class = MovieDetailSerializer
-    lookup_field = 'id'
-
-
 # @api_view(['GET', 'POST'])
 # def get_review_list(request):
 #     if request.method == 'GET':
@@ -174,11 +185,6 @@ class MovieDetailAPIVIew(RetrieveUpdateDestroyAPIView):
 #             },
 #             status=201
 #         )
-
-
-class ReviewAPIView(ListCreateAPIView):
-    queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
 
 
 # @api_view(['GET', 'PUT', 'DELETE'])
@@ -217,12 +223,6 @@ class ReviewAPIView(ListCreateAPIView):
 #         )
 
 
-class ReviewDetailAPIVIew(RetrieveUpdateDestroyAPIView):
-        queryset = Review.objects.all()
-        serializer_class = ReviewDetailSerializer
-        lookup_field = 'id'
-
-
 # @api_view(['GET'])
 # def review_movie(request):
 #     review_m = Movie.objects.all()
@@ -230,6 +230,4 @@ class ReviewDetailAPIVIew(RetrieveUpdateDestroyAPIView):
 #     return Response(data=serializer, status=status.HTTP_200_OK)
 
 
-class ReviewMovieAPIView(ListAPIView):
-    queryset = Movie.objects.all()
-    serializer_class = MovieReviewSerializer
+
